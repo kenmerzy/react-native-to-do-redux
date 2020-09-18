@@ -3,12 +3,20 @@ import { Dimensions } from 'react-native'
 const { width } = Dimensions.get('window')
 
 export const Fonts = {
-  fontRegular: {
+  regular: {
     fontFamily: 'Montserrat-Regular',
   },
-  fontBold: {
+  bold: {
     fontFamily: 'Montserrat-Bold',
-    color: '#FFFFFF',
-    fontSize: 32,
   },
+  semiBold: {
+    fontFamily: 'Montserrat-SemiBold',
+  },
+}
+export const Colors = {
+  lightBlue: '#56CCF2',
+  white: '#FFFFFF',
+  black: '#4F4F4F',
+  gray: '#BDBDBD',
+  darkBlue: '#2D9CDB',
 }

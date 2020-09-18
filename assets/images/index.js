@@ -1,2 +1,3 @@
-export const iconAdd = require('./iconAdd.png')
-export const iconBack = require('./iconBack.png')
+export const imgAdd = require('./imgAdd.png')
+export const imgDelete = require('./imgDelete.png')
+export const imgSend = require('./imgSend.png')
