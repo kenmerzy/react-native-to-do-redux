@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
-  View, Text, TouchableOpacity, StyleSheet, Dimensions, Image,
+  View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Animated,
 } from 'react-native'
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
 import { useSelector, useDispatch } from 'react-redux'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FlatList } from 'react-native-gesture-handler'
+import { FlatList, TextInput } from 'react-native-gesture-handler'
 import { Fonts, Colors } from '../../assets/styles'
 import { imgAdd, imgSend, imgDelete } from '../../assets/images'
-import { addNewTodo, deleteTodo } from '../../redux/action'
+import { addNewTodo, deleteTodo, markedTodo } from '../../redux/action'
 
 const { width } = Dimensions.get('window')
 const screenScale = width / 375
@@ -21,13 +21,6 @@ const MainScreen = (props) => {
 
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
 
-  const handleDeletePress = (itemDelete) => {
-    dispatch(deleteTodo(itemDelete))
-  }
-  const handleMarkedDoneTodo = () => {
-
-  }
-
   const NewToDoComponent = () => {
     return (
       <View style={{ flex: 1 }}>
@@ -36,8 +29,43 @@ const MainScreen = (props) => {
     )
   }
   const AllToDoComponent = () => {
+    const [isTextInputReady, setIsTextInputReady] = useState(false)
+    const [textInputValue, setTextInputValue] = useState(false)
+    const handleDeletePress = (itemDelete) => {
+      dispatch(deleteTodo(itemDelete))
+    }
+    const handleMarkedDoneTodo = (itemMark) => {
+      // dispatch(markedTodo(itemMark))
+    }
+
+    const textInputAnimation = useRef(new Animated.Value(0)).current
+
+    const handleShowTextInput = () => {
+      Animated.spring(textInputAnimation, {
+        toValue: 1,
+        tension: 150,
+        useNativeDriver: true,
+      }).start()
+    }
+
+    const handleAddTodo = (itemAdd) => {
+      dispatch(addNewTodo(itemAdd))
+    }
+    const tranX = textInputAnimation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-300, 0],
+    })
+
+    console.tron.log({
+      // eslint-disable-next-line react/destructuring-assignment
+      isTextInputReady,
+      textInputValue,
+    })
+
     return (
-      <View style={{ flex: 1 }}>
+      <View
+        style={{ flex: 1 }}
+      >
         <FlatList
           showsVerticalScrollIndicator={false}
           data={todos.currentTodo}
@@ -56,7 +84,7 @@ const MainScreen = (props) => {
                   alignItems: 'center',
                 }}
                 >
-                  <TouchableOpacity onPress={handleMarkedDoneTodo}>
+                  <TouchableOpacity onPress={handleMarkedDoneTodo(item)}>
                     <View
                       style={{
                         width: 18 * screenScale,
@@ -96,6 +124,67 @@ const MainScreen = (props) => {
             )
           }}
         />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+          }}
+        >
+          <Animated.View
+            style={{
+              width: 250,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: Colors.lightBlue,
+              paddingLeft: 20,
+              transform: [{
+                translateX: tranX,
+              }],
+            }}
+          >
+            <TextInput
+              style={{
+
+                ...Fonts.semiBold,
+                fontSize: 14,
+                color: Colors.white,
+                alignItems: 'center',
+                backgroundColor: 'transparent',
+
+              }}
+              placeholder="Todo..."
+              placeholderTextColor={Colors.white}
+              onChangeText={(textInput) => { setTextInputValue(textInput) }}
+              value={textInputValue}
+            />
+          </Animated.View>
+          <TouchableOpacity
+            onPress={isTextInputReady ? handleAddTodo(textInputValue) : handleShowTextInput}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: Colors.lightBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
+
+              }}
+            >
+              <Image
+                source={isTextInputReady ? imgSend : imgAdd}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                resizeMode="contain"
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
         <SafeAreaView />
       </View>
 
@@ -122,7 +211,7 @@ const MainScreen = (props) => {
         color: Colors.black,
         paddingLeft: 3 * screenScale,
         marginTop: 46 * screenScale,
-        marginBottom: 22 * screenScale,
+        marginBottom: 10 * screenScale,
       }}
       >
         Todo
@@ -146,10 +235,10 @@ const MainScreen = (props) => {
             style={{ backgroundColor: Colors.white }}
             renderLabel={({ route, focused, color }) => (
               <Text style={{
-                color: focused ? Colors.darkBlue : Colors.black,
                 ...Fonts.semiBold,
                 fontSize: 18,
                 textTransform: 'uppercase',
+                color: focused ? Colors.darkBlue : Colors.gray,
               }}
               >
                 {route.title}

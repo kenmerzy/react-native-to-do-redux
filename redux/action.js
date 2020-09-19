@@ -12,3 +12,9 @@ export const deleteTodo = (data) => {
     payload: { data },
   }
 }
+export const markedTodo = (data) => {
+  return {
+    type: TodoTypes.MARK_TODO_DONE,
+    payload: { data },
+  }
+}
