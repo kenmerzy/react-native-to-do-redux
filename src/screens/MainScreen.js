@@ -17,6 +17,9 @@ const intialLayout = { width }
 const MainScreen = (props) => {
   const dispatch = useDispatch()
   const todos = useSelector((state) => state)
+  console.log('================================================')
+  console.log('todos', todos)
+  console.log('================================================')
   const { navigation } = props
 
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
@@ -30,12 +33,12 @@ const MainScreen = (props) => {
   }
   const AllToDoComponent = () => {
     const [isTextInputReady, setIsTextInputReady] = useState(false)
-    const [textInputValue, setTextInputValue] = useState(false)
+    const [textInputValue, setTextInputValue] = useState('')
     const handleDeletePress = (itemDelete) => {
       dispatch(deleteTodo(itemDelete))
     }
     const handleMarkedDoneTodo = (itemMark) => {
-      // dispatch(markedTodo(itemMark))
+      dispatch(markedTodo(itemMark))
     }
 
     const textInputAnimation = useRef(new Animated.Value(0)).current
@@ -84,7 +87,7 @@ const MainScreen = (props) => {
                   alignItems: 'center',
                 }}
                 >
-                  <TouchableOpacity onPress={handleMarkedDoneTodo(item)}>
+                  <TouchableOpacity onPress={() => handleMarkedDoneTodo(item)}>
                     <View
                       style={{
                         width: 18 * screenScale,
@@ -146,7 +149,6 @@ const MainScreen = (props) => {
           >
             <TextInput
               style={{
-
                 ...Fonts.semiBold,
                 fontSize: 14,
                 color: Colors.white,
