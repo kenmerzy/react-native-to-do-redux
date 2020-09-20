@@ -49,6 +49,8 @@ const MainScreen = (props) => {
         tension: 150,
         useNativeDriver: true,
       }).start()
+
+      setIsTextInputReady(true)
     }
 
     const handleAddTodo = (itemAdd) => {
@@ -75,29 +77,11 @@ const MainScreen = (props) => {
           keyExtractor={(item, index) => `RenderAllComponent${index}`}
           renderItem={({ item }) => {
             return (
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: 22 * screenScale,
-              }}
-              >
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-                >
+              <View style={styles.itemFlatList}>
+                <View style={styles.viewMarkedAndTitle}>
                   <TouchableOpacity onPress={() => handleMarkedDoneTodo(item)}>
                     <View
-                      style={{
-                        width: 18 * screenScale,
-                        height: 18 * screenScale,
-                        borderRadius: 9 * screenScale,
-                        borderColor: Colors.gray,
-                        borderWidth: 3 * StyleSheet.hairlineWidth,
-                        marginRight: 14 * screenScale,
-
-                      }}
+                      style={styles.viewMarked}
                     />
                   </TouchableOpacity>
                   <Text
@@ -115,10 +99,7 @@ const MainScreen = (props) => {
                 >
                   <Image
                     source={imgDelete}
-                    style={{
-                      width: 24 * screenScale,
-                      height: 24 * screenScale,
-                    }}
+                    style={styles.imageDelete}
                     resizeMode="contain"
                   />
                 </TouchableOpacity>
@@ -128,24 +109,14 @@ const MainScreen = (props) => {
           }}
         />
         <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 10,
-          }}
+          style={styles.viewBorderInput}
         >
           <Animated.View
-            style={{
-              width: 250,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: Colors.lightBlue,
-              paddingLeft: 20,
+            style={[styles.viewTextInput, {
               transform: [{
                 translateX: tranX,
               }],
-            }}
+            }]}
           >
             <TextInput
               style={{
@@ -160,10 +131,11 @@ const MainScreen = (props) => {
               placeholderTextColor={Colors.white}
               onChangeText={(textInput) => { setTextInputValue(textInput) }}
               value={textInputValue}
+            // returnKeyType="google"
             />
           </Animated.View>
           <TouchableOpacity
-            onPress={isTextInputReady ? handleAddTodo(textInputValue) : handleShowTextInput}
+            onPress={isTextInputReady ? () => { handleAddTodo(textInputValue) } : handleShowTextInput}
           >
             <View
               style={{
@@ -259,6 +231,43 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 36 * screenScale,
     backgroundColor: Colors.white,
+  },
+  itemFlatList: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 22 * screenScale,
+  },
+  viewMarked: {
+    width: 18 * screenScale,
+    height: 18 * screenScale,
+    borderRadius: 9 * screenScale,
+    borderColor: Colors.gray,
+    borderWidth: 3 * StyleSheet.hairlineWidth,
+    marginRight: 14 * screenScale,
+
+  },
+  viewMarkedAndTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  imageDelete: {
+    width: 24 * screenScale,
+    height: 24 * screenScale,
+  },
+  viewBorderInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  viewTextInput: {
+    width: 250,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.lightBlue,
+    paddingLeft: 20,
+
   },
 
 })
