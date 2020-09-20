@@ -1,8 +1,7 @@
 import * as TodoTypes from './type'
 
 const initState = {
-  currentTodo: ['Do homework', 'Listen to music', 'Drink water', 'Make a cake',
-  ],
+  currentTodo: ['Do homework', 'Listen to music', 'Drink water', 'Make a cake'],
   markedDoneTodo: [],
 }
 
@@ -13,10 +12,15 @@ const todoReducer = (state = initState, action) => {
     case TodoTypes.DELETE_TODO:
       return { ...state, currentTodo: state.currentTodo.filter((todo) => { return todo !== action.payload.data }) }
     case TodoTypes.MARK_TODO_DONE:
-      const newState = state
-      newState.markedDoneTodo.push(action.payload.data)
-      newState.currentTodo.pop(action.payload.data)
-      return newState
+      return {
+        ...state,
+        currentTodo: state.currentTodo.filter((todo) => { return todo !== action.payload.data }),
+        markedDoneTodo: [...state.markedDoneTodo, action.payload.data],
+      }
+    // const newState = state
+    // newState.markedDoneTodo.push(action.payload.data)
+    // newState.currentTodo.pop(action.payload.data)
+    // return newState
     default:
       return state
   }
