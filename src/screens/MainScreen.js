@@ -1,14 +1,18 @@
 import React, { useState, useRef } from 'react'
 import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Animated,
+  Platform, Modal,
 } from 'react-native'
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
 import { useSelector, useDispatch } from 'react-redux'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FlatList, TextInput } from 'react-native-gesture-handler'
+import { FlatList, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { KeyboardSpacer } from 'react-native-keyboard-spacer'
 import { Fonts, Colors } from '../../assets/styles'
 import { imgAdd, imgSend, imgDelete } from '../../assets/images'
-import { addNewTodo, deleteTodo, markedTodo } from '../../redux/action'
+import {
+  addNewTodo, deleteTodoNew, deleteTodoDone, markedTodo,
+} from '../../redux/action'
 
 const { width } = Dimensions.get('window')
 const screenScale = width / 375
@@ -17,19 +21,35 @@ const intialLayout = { width }
 const MainScreen = (props) => {
   const dispatch = useDispatch()
   const todos = useSelector((state) => state)
-  console.log('================================================')
-  console.log('todos', todos)
-  console.log('================================================')
+  const [currentTabIndex, setCurrentTabIndex] = useState(0)
+  const [isDelete, setIsDelete] = useState(false)
+
+  const [isModalConfirmDeleteShow, setIsModalConfirmDeleteShow] = useState(false)
+  const [showSafeAreaView, setShowSafeAreaView] = useState(false)
+
   const { navigation } = props
 
-  const [currentTabIndex, setCurrentTabIndex] = useState(0)
+  const handleDeleteNew = (itemDelete) => {
+    setIsModalConfirmDeleteShow(true)
+    if (isDelete) {
+      dispatch(deleteTodoNew(itemDelete))
+    }
+  }
+  const handleDeleteDone = (itemDelete) => {
+    console.log('===============================================')
+    console.log('isDelete', isDelete)
+    console.log('===============================================')
+    setIsModalConfirmDeleteShow(true)
+
+    if (isDelete) {
+      dispatch(deleteTodoDone(itemDelete))
+    }
+  }
 
   const NewToDoComponent = () => {
     const [isTextInputReady, setIsTextInputReady] = useState(false)
     const [textInputValue, setTextInputValue] = useState('')
-    const handleDeletePress = (itemDelete) => {
-      dispatch(deleteTodo(itemDelete))
-    }
+
     const handleMarkedDoneTodo = (itemMark) => {
       dispatch(markedTodo(itemMark))
     }
@@ -62,16 +82,13 @@ const MainScreen = (props) => {
 
     return (
       <View
-        style={{ flex: 1 }}
+        style={styles.wrapperTab}
       >
         <FlatList
           showsVerticalScrollIndicator={false}
           data={todos.currentTodo}
           keyExtractor={(item, index) => `RenderNewComponent${index}`}
           renderItem={({ item }) => {
-            console.log('================================================')
-            console.log('item', item)
-            console.log('================================================')
             return (
               <View style={styles.itemFlatList}>
                 <View style={styles.viewMarkedAndTitle}>
@@ -87,7 +104,7 @@ const MainScreen = (props) => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => { handleDeletePress(item) }}
+                  onPress={() => { handleDeleteNew(item) }}
                 >
                   <Image
                     source={imgDelete}
@@ -133,7 +150,8 @@ const MainScreen = (props) => {
             </View>
           </TouchableOpacity>
         </View>
-        <SafeAreaView />
+        {Platform.OS === 'ios' && <KeyboardSpacer onToggle={(state) => { setShowSafeAreaView(!state) }} />}
+        {showSafeAreaView && <SafeAreaView />}
       </View>
 
     )
@@ -141,16 +159,13 @@ const MainScreen = (props) => {
   const AllToDoComponent = () => {
     return (
       <View
-        style={{ flex: 1 }}
+        style={styles.wrapperTab}
       >
         <FlatList
           showsVerticalScrollIndicator={false}
           data={[...todos.currentTodo, ...todos.markedDoneTodo]}
           keyExtractor={(item, index) => `RenderAllComponent${index}`}
           renderItem={({ item }) => {
-            console.log('===============================================')
-            console.log('itemALl', item)
-            console.log('===============================================')
             return (
               <View style={styles.itemFlatList}>
                 <View style={styles.viewMarkedAndTitle}>
@@ -166,7 +181,9 @@ const MainScreen = (props) => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => { }}
+                  onPress={
+                    item.isDone ? (() => { handleDeleteDone(item) }) : (() => { handleDeleteNew(item) })
+                  }
                 >
                   <Image
                     source={imgDelete}
@@ -188,7 +205,7 @@ const MainScreen = (props) => {
   const DoneComponent = () => {
     return (
       <View
-        style={{ flex: 1 }}
+        style={styles.wrapperTab}
       >
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -210,7 +227,7 @@ const MainScreen = (props) => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => { }}
+                  onPress={() => { handleDeleteDone(item) }}
                 >
                   <Image
                     source={imgDelete}
@@ -236,15 +253,7 @@ const MainScreen = (props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={{
-        ...Fonts.bold,
-        fontSize: 40 * screenScale,
-        color: Colors.black,
-        paddingLeft: 3 * screenScale,
-        marginTop: 46 * screenScale,
-        marginBottom: 10 * screenScale,
-      }}
-      >
+      <Text style={styles.textTitleTodo}>
         Todo
       </Text>
       <TabView
@@ -265,19 +274,114 @@ const MainScreen = (props) => {
             indicatorStyle={{ backgroundColor: Colors.darkBlue }}
             style={{ backgroundColor: Colors.white }}
             renderLabel={({ route, focused, color }) => (
-              <Text style={{
-                ...Fonts.semiBold,
-                fontSize: 18,
-                textTransform: 'uppercase',
-                color: focused ? Colors.darkBlue : Colors.gray,
-              }}
-              >
+              <Text style={[styles.textTabBarTitle, { color: focused ? Colors.darkBlue : Colors.gray }]}>
                 {route.title}
               </Text>
             )}
           />
         )}
       />
+      <Modal
+        visible={isModalConfirmDeleteShow}
+        animationType="slide"
+        transparent
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'gray',
+            opacity: 0.8,
+          }}
+        >
+          <View
+            style={{
+              width: 300,
+              height: 120,
+              backgroundColor: Colors.black,
+              borderRadius: 30,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <View style={{
+              flex: 5,
+              justifyContent: 'center',
+              alignItems: 'center',
+
+            }}
+            >
+              <Text style={{
+
+                ...Fonts.bold,
+                fontSize: 18,
+                color: Colors.white,
+
+              }}
+              >
+                Do you want to delete  ?
+              </Text>
+            </View>
+            <View style={{
+              flex: 2,
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderColor: Colors.white,
+              borderTopWidth: StyleSheet.hairlineWidth,
+            }}
+            >
+              <View style={{
+                flex: 1,
+                alignItems: 'center',
+                borderColor: Colors.white,
+                borderRightWidth: StyleSheet.hairlineWidth,
+              }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsDelete(false)
+                    setIsModalConfirmDeleteShow(false)
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...Fonts.semiBold,
+                      fontSize: 17,
+                      color: '#00FF00',
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{
+                flex: 1,
+                alignItems: 'center',
+              }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsDelete(true)
+                    setIsModalConfirmDeleteShow(false)
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...Fonts.semiBold,
+                      fontSize: 17,
+                      color: '#FF0000',
+                    }}
+                  >
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -364,5 +468,19 @@ const styles = StyleSheet.create({
     color: Colors.lightBlue,
     textDecorationLine: 'line-through',
   },
+  wrapperTab: { flex: 1 },
+  textTitleTodo: {
+    ...Fonts.bold,
+    fontSize: 40 * screenScale,
+    color: Colors.black,
+    paddingLeft: 3 * screenScale,
+    marginTop: 46 * screenScale,
+    marginBottom: 10 * screenScale,
+  },
+  textTabBarTitle: {
+    ...Fonts.semiBold,
+    fontSize: 18,
+    textTransform: 'uppercase',
 
+  },
 })

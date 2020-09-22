@@ -31,10 +31,16 @@ const todoReducer = (state = initState, action) => {
         // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
 
       }
-    case TodoTypes.DELETE_TODO:
+    case TodoTypes.DELETE_TODO_NEW:
       return {
         ...state,
         currentTodo: state.currentTodo.filter((todo) => { return todo !== action.payload.data }),
+        // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
+      }
+    case TodoTypes.DELETE_TODO_DONE:
+      return {
+        ...state,
+        markedDoneTodo: state.markedDoneTodo.filter((todo) => { return todo !== action.payload.data }),
         // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
       }
     case TodoTypes.MARK_TODO_DONE:

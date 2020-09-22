@@ -6,9 +6,15 @@ export const addNewTodo = (data) => {
     payload: { data },
   }
 }
-export const deleteTodo = (data) => {
+export const deleteTodoNew = (data) => {
   return {
-    type: TodoTypes.DELETE_TODO,
+    type: TodoTypes.DELETE_TODO_NEW,
+    payload: { data },
+  }
+}
+export const deleteTodoDone = (data) => {
+  return {
+    type: TodoTypes.DELETE_TODO_DONE,
     payload: { data },
   }
 }
