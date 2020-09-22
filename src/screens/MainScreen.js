@@ -25,13 +25,6 @@ const MainScreen = (props) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
 
   const NewToDoComponent = () => {
-    return (
-      <View style={{ flex: 1 }}>
-        <Text>New to do Screen</Text>
-      </View>
-    )
-  }
-  const AllToDoComponent = () => {
     const [isTextInputReady, setIsTextInputReady] = useState(false)
     const [textInputValue, setTextInputValue] = useState('')
     const handleDeletePress = (itemDelete) => {
@@ -74,8 +67,11 @@ const MainScreen = (props) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={todos.currentTodo}
-          keyExtractor={(item, index) => `RenderAllComponent${index}`}
+          keyExtractor={(item, index) => `RenderNewComponent${index}`}
           renderItem={({ item }) => {
+            console.log('================================================')
+            console.log('item', item)
+            console.log('================================================')
             return (
               <View style={styles.itemFlatList}>
                 <View style={styles.viewMarkedAndTitle}>
@@ -85,13 +81,9 @@ const MainScreen = (props) => {
                     />
                   </TouchableOpacity>
                   <Text
-                    style={{
-                      ...Fonts.semiBold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    }}
+                    style={styles.textTitleBlack}
                   >
-                    {item}
+                    {item.title}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -119,14 +111,7 @@ const MainScreen = (props) => {
             }]}
           >
             <TextInput
-              style={{
-                ...Fonts.semiBold,
-                fontSize: 14,
-                color: Colors.white,
-                alignItems: 'center',
-                backgroundColor: 'transparent',
-
-              }}
+              style={styles.textInputAdd}
               placeholder="Todo..."
               placeholderTextColor={Colors.white}
               onChangeText={(textInput) => { setTextInputValue(textInput) }}
@@ -138,22 +123,11 @@ const MainScreen = (props) => {
             onPress={isTextInputReady ? () => { handleAddTodo(textInputValue) } : handleShowTextInput}
           >
             <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: Colors.lightBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-
-              }}
+              style={styles.viewImageAdd}
             >
               <Image
                 source={isTextInputReady ? imgSend : imgAdd}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
+                style={styles.imageAdd}
                 resizeMode="contain"
               />
             </View>
@@ -164,11 +138,94 @@ const MainScreen = (props) => {
 
     )
   }
+  const AllToDoComponent = () => {
+    return (
+      <View
+        style={{ flex: 1 }}
+      >
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={[...todos.currentTodo, ...todos.markedDoneTodo]}
+          keyExtractor={(item, index) => `RenderAllComponent${index}`}
+          renderItem={({ item }) => {
+            console.log('===============================================')
+            console.log('itemALl', item)
+            console.log('===============================================')
+            return (
+              <View style={styles.itemFlatList}>
+                <View style={styles.viewMarkedAndTitle}>
+                  <TouchableOpacity onPress={() => { }}>
+                    <View
+                      style={item.isDone ? styles.viewCircleDone : styles.viewMarked}
+                    />
+                  </TouchableOpacity>
+                  <Text
+                    style={item.isDone ? styles.textTitleLightBlue : styles.textTitleBlack}
+                  >
+                    {item.title}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => { }}
+                >
+                  <Image
+                    source={imgDelete}
+                    style={styles.imageDelete}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+
+              </View>
+            )
+          }}
+        />
+
+        <SafeAreaView />
+      </View>
+
+    )
+  }
   const DoneComponent = () => {
     return (
-      <View style={{ flex: 1 }}>
-        <Text> Done Screen </Text>
+      <View
+        style={{ flex: 1 }}
+      >
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={todos.markedDoneTodo}
+          keyExtractor={(item, index) => `RenderMarkedComponent${index}`}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.itemFlatList}>
+                <View style={styles.viewMarkedAndTitle}>
+                  <TouchableOpacity onPress={() => { }}>
+                    <View
+                      style={styles.viewCircleDone}
+                    />
+                  </TouchableOpacity>
+                  <Text
+                    style={styles.textTitleLightBlue}
+                  >
+                    {item.title}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => { }}
+                >
+                  <Image
+                    source={imgDelete}
+                    style={styles.imageDelete}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+
+              </View>
+            )
+          }}
+        />
+        <SafeAreaView />
       </View>
+
     )
   }
   const renderScene = SceneMap({
@@ -242,10 +299,9 @@ const styles = StyleSheet.create({
     width: 18 * screenScale,
     height: 18 * screenScale,
     borderRadius: 9 * screenScale,
+    marginRight: 14 * screenScale,
     borderColor: Colors.gray,
     borderWidth: 3 * StyleSheet.hairlineWidth,
-    marginRight: 14 * screenScale,
-
   },
   viewMarkedAndTitle: {
     flexDirection: 'row',
@@ -268,6 +324,45 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightBlue,
     paddingLeft: 20,
 
+  },
+  textTitleBlack: {
+    ...Fonts.semiBold,
+    fontSize: 18,
+    color: Colors.black,
+  },
+  textInputAdd: {
+    ...Fonts.semiBold,
+    fontSize: 14,
+    color: Colors.white,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+
+  },
+  viewImageAdd: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.lightBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+
+  },
+  imageAdd: {
+    width: 24,
+    height: 24,
+  },
+  viewCircleDone: {
+    width: 18 * screenScale,
+    height: 18 * screenScale,
+    borderRadius: 9 * screenScale,
+    marginRight: 14 * screenScale,
+    backgroundColor: Colors.lightBlue,
+  },
+  textTitleLightBlue: {
+    ...Fonts.semiBold,
+    fontSize: 18,
+    color: Colors.lightBlue,
+    textDecorationLine: 'line-through',
   },
 
 })

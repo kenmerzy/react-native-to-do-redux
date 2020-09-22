@@ -1,26 +1,51 @@
+/* eslint-disable indent */
 import * as TodoTypes from './type'
 
 const initState = {
-  currentTodo: ['Do homework', 'Listen to music', 'Drink water', 'Make a cake'],
+  currentTodo: [{
+    title: 'Do homework',
+    isDone: false,
+  }, {
+    title: 'Listen to music',
+    isDone: false,
+  }, {
+    title: 'Sleep',
+    isDone: false,
+  }, {
+    title: 'Call mom',
+    isDone: false,
+  }],
   markedDoneTodo: [],
+  // allTodo: [],
 }
+console.log('===============================================')
+console.log('initState', initState)
+console.log('===============================================')
 
 const todoReducer = (state = initState, action) => {
   switch (action.type) {
     case TodoTypes.ADD_NEW_TODO:
-      return { ...state, currentTodo: [...state.currentTodo, action.payload.data] }
+      return {
+        ...state,
+        currentTodo: [...state.currentTodo, { title: action.payload.data, isDone: false }],
+        // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
+
+      }
     case TodoTypes.DELETE_TODO:
-      return { ...state, currentTodo: state.currentTodo.filter((todo) => { return todo !== action.payload.data }) }
-    case TodoTypes.MARK_TODO_DONE:
       return {
         ...state,
         currentTodo: state.currentTodo.filter((todo) => { return todo !== action.payload.data }),
-        markedDoneTodo: [...state.markedDoneTodo, action.payload.data],
+        // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
       }
-    // const newState = state
-    // newState.markedDoneTodo.push(action.payload.data)
-    // newState.currentTodo.pop(action.payload.data)
-    // return newState
+    case TodoTypes.MARK_TODO_DONE:
+
+      return {
+        ...state,
+        currentTodo: state.currentTodo.filter((todo) => { return todo.title !== action.payload.data.title }),
+        markedDoneTodo: [...state.markedDoneTodo, { title: action.payload.data.title, isDone: true }],
+        // allTodo: [...state.currentTodo, ...state.markedDoneTodo],
+      }
+
     default:
       return state
   }
