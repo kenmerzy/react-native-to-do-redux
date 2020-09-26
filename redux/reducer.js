@@ -15,12 +15,21 @@ const initState = {
     title: 'Call mom',
     isDone: false,
   }],
-  markedDoneTodo: [],
+  markedDoneTodo: [{
+    title: 'Play Yasuo',
+    isDone: true,
+  }, {
+    title: 'Hit the Gym',
+    isDone: true,
+  }, {
+    title: 'Buy a cake',
+    isDone: true,
+  }, {
+    title: 'Set an Alarm',
+    isDone: true,
+  }],
   // allTodo: [],
 }
-console.log('===============================================')
-console.log('initState', initState)
-console.log('===============================================')
 
 const todoReducer = (state = initState, action) => {
   switch (action.type) {

@@ -6,7 +6,7 @@ import {
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
 import { useSelector, useDispatch } from 'react-redux'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FlatList, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { FlatList, TextInput } from 'react-native-gesture-handler'
 import { KeyboardSpacer } from 'react-native-keyboard-spacer'
 import { Fonts, Colors } from '../../assets/styles'
 import { imgAdd, imgSend, imgDelete } from '../../assets/images'
@@ -22,27 +22,23 @@ const MainScreen = (props) => {
   const dispatch = useDispatch()
   const todos = useSelector((state) => state)
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
+  const [itemDelete, setItemDelete] = useState('')
   const [isDelete, setIsDelete] = useState(false)
 
   const [isModalConfirmDeleteShow, setIsModalConfirmDeleteShow] = useState(false)
   const [showSafeAreaView, setShowSafeAreaView] = useState(false)
 
-  const { navigation } = props
+  // const { navigation } = props
 
-  const handleDeleteNew = (itemDelete) => {
-    setIsModalConfirmDeleteShow(true)
+  const handleDeleteItem = (itemDelete) => {
     if (isDelete) {
-      dispatch(deleteTodoNew(itemDelete))
-    }
-  }
-  const handleDeleteDone = (itemDelete) => {
-    console.log('===============================================')
-    console.log('isDelete', isDelete)
-    console.log('===============================================')
-    setIsModalConfirmDeleteShow(true)
-
-    if (isDelete) {
-      dispatch(deleteTodoDone(itemDelete))
+      if (itemDelete.isDone) {
+        dispatch(deleteTodoDone(itemDelete))
+      } else {
+        dispatch(deleteTodoNew(itemDelete))
+      }
+      // setIsDelete(false)
+      // setIsModalConfirmDeleteShow(false)
     }
   }
 
@@ -78,6 +74,8 @@ const MainScreen = (props) => {
       // eslint-disable-next-line react/destructuring-assignment
       isTextInputReady,
       textInputValue,
+      isDelete,
+      itemDeleteBegin: itemDelete,
     })
 
     return (
@@ -104,7 +102,10 @@ const MainScreen = (props) => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => { handleDeleteNew(item) }}
+                  onPress={() => {
+                    setItemDelete(item)
+                    setIsModalConfirmDeleteShow(true)
+                  }}
                 >
                   <Image
                     source={imgDelete}
@@ -182,7 +183,18 @@ const MainScreen = (props) => {
                 </View>
                 <TouchableOpacity
                   onPress={
-                    item.isDone ? (() => { handleDeleteDone(item) }) : (() => { handleDeleteNew(item) })
+                    () => {
+                      console.tron.log({
+                        itemDeleteBefore: itemDelete,
+                        isDelete,
+                      })
+                      setItemDelete(item)
+                      setIsModalConfirmDeleteShow(true)
+                      console.tron.log({
+                        itemDelete,
+                        isDelete,
+                      })
+                    }
                   }
                 >
                   <Image
@@ -227,7 +239,10 @@ const MainScreen = (props) => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => { handleDeleteDone(item) }}
+                  onPress={() => {
+                    setItemDelete(item)
+                    setIsModalConfirmDeleteShow(true)
+                  }}
                 >
                   <Image
                     source={imgDelete}
@@ -363,6 +378,7 @@ const MainScreen = (props) => {
                 <TouchableOpacity
                   onPress={() => {
                     setIsDelete(true)
+                    handleDeleteItem(itemDelete)
                     setIsModalConfirmDeleteShow(false)
                   }}
                 >
