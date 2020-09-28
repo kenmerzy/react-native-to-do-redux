@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Animated,
   Platform, Modal,
@@ -24,20 +24,22 @@ const MainScreen = (props) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
   const [itemDelete, setItemDelete] = useState('')
   const [isDelete, setIsDelete] = useState(false)
-
+  useEffect(() => {
+    handleDeleteItem(itemDelete)
+  }, [isDelete])
   const [isModalConfirmDeleteShow, setIsModalConfirmDeleteShow] = useState(false)
   const [showSafeAreaView, setShowSafeAreaView] = useState(false)
 
   // const { navigation } = props
 
-  const handleDeleteItem = (itemDelete) => {
+  const handleDeleteItem = (itemD) => {
     if (isDelete) {
-      if (itemDelete.isDone) {
-        dispatch(deleteTodoDone(itemDelete))
+      if (itemD.isDone) {
+        dispatch(deleteTodoDone(itemD))
       } else {
-        dispatch(deleteTodoNew(itemDelete))
+        dispatch(deleteTodoNew(itemD))
       }
-      // setIsDelete(false)
+      setIsDelete(false)
       // setIsModalConfirmDeleteShow(false)
     }
   }
@@ -378,7 +380,6 @@ const MainScreen = (props) => {
                 <TouchableOpacity
                   onPress={() => {
                     setIsDelete(true)
-                    handleDeleteItem(itemDelete)
                     setIsModalConfirmDeleteShow(false)
                   }}
                 >
