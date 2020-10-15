@@ -63,14 +63,14 @@ const MainScreen = (props) => {
 
       setIsTextInputReady(true)
     }
-
-    const handleAddTodo = (itemAdd) => {
-      dispatch(addNewTodo(itemAdd))
-    }
     const tranX = textInputAnimation.interpolate({
       inputRange: [0, 1],
       outputRange: [-300, 0],
     })
+
+    const handleAddTodo = (itemAdd) => {
+      dispatch(addNewTodo(itemAdd))
+    }
 
     console.tron.log({
       // eslint-disable-next-line react/destructuring-assignment
@@ -107,6 +107,11 @@ const MainScreen = (props) => {
                   onPress={() => {
                     setItemDelete(item)
                     setIsModalConfirmDeleteShow(true)
+                    Animated.spring(modalDeleteAnimation, {
+                      toValue: 1,
+                      tension: 60,
+                      useNativeDriver: true,
+                    }).start()
                   }}
                 >
                   <Image
@@ -186,10 +191,11 @@ const MainScreen = (props) => {
                 <TouchableOpacity
                   onPress={
                     () => {
-                      console.tron.log({
-                        itemDeleteBefore: itemDelete,
-                        isDelete,
-                      })
+                      Animated.spring(modalDeleteAnimation, {
+                        toValue: 1,
+                        tension: 60,
+                        useNativeDriver: true,
+                      }).start()
                       setItemDelete(item)
                       setIsModalConfirmDeleteShow(true)
                       console.tron.log({
@@ -242,6 +248,11 @@ const MainScreen = (props) => {
                 </View>
                 <TouchableOpacity
                   onPress={() => {
+                    Animated.spring(modalDeleteAnimation, {
+                      toValue: 1,
+                      tension: 60,
+                      useNativeDriver: true,
+                    }).start()
                     setItemDelete(item)
                     setIsModalConfirmDeleteShow(true)
                   }}
@@ -268,6 +279,12 @@ const MainScreen = (props) => {
     done: DoneComponent,
   })
 
+  const modalDeleteAnimation = useRef(new Animated.Value(0)).current
+
+  const tranY = modalDeleteAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [600, 0],
+  })
   return (
     <View style={styles.container}>
       <Text style={styles.textTitleTodo}>
@@ -300,7 +317,7 @@ const MainScreen = (props) => {
       />
       <Modal
         visible={isModalConfirmDeleteShow}
-        animationType="slide"
+        // animationType="slide"
         transparent
       >
         <View
@@ -312,15 +329,19 @@ const MainScreen = (props) => {
             opacity: 0.8,
           }}
         >
-          <View
-            style={{
+          <Animated.View
+            style={[{
               width: 300,
               height: 120,
               backgroundColor: Colors.black,
               borderRadius: 30,
               justifyContent: 'center',
               alignItems: 'center',
-            }}
+            }, {
+              transform: [{
+                translateY: tranY,
+              }],
+            }]}
           >
             <View style={{
               flex: 5,
@@ -357,8 +378,9 @@ const MainScreen = (props) => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setIsDelete(false)
                     setIsModalConfirmDeleteShow(false)
+
+                    setIsDelete(false)
                   }}
                 >
                   <Text
@@ -396,7 +418,7 @@ const MainScreen = (props) => {
               </View>
 
             </View>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </View>
